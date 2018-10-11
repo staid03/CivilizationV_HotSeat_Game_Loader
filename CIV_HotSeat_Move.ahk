@@ -11,9 +11,8 @@ backupFolder = %primaryFolder%backups               ;backup folder created for b
 
 IfNotExist, %dowloadFolder%%gamefile%
 {
-    msg = Could not find %gamefile% - script ending here
+    msg = Could not find %gamefile%
     errorMessage(msg)
-    Return
 }
 
 IfExist, %primaryFolder%*.Civ5Save
@@ -23,25 +22,37 @@ IfExist, %primaryFolder%*.Civ5Save
         FileCreateDir, %backupFolder%
         If ErrorLevel
         {
-            msg = Could not create folder %backupFolder% - script ending here
+            msg = Could not create folder %backupFolder%
             errorMessage(msg)
-            Return
         }
     }
     IfExist, %primaryFolder%%gamefile%
     {
-        FormatTime, atime, yyyyMMdd_HHmmss
+        FormatTime, atime , ,  yyyyMMdd_HHmmss
         FileMove, %primaryFolder%%gamefile% , %backupFolder%\%atime%_%gamefile%
+        If ErrorLevel
+        {
+            msg = Could not move files - %primaryFolder%%gamefile% -- %backupFolder%\%gamefile%_%atime%
+            errorMessage(msg)
+        }
     }
     FileMove, %primaryFolder%*.Civ5Save , %backupFolder%\
-    sleep, 500
+    If ErrorLevel
+    {
+        msg = Could not move files - %primaryFolder%*.Civ5Save -- %backupFolder%\
+        errorMessage(msg)
+    }
+    Sleep, 500
 }
 
+FileMove, %dowloadFolder%%gamefile% , %primaryFolder%%gamefile%
+If ErrorLevel
 {
-    FileMove, %dowloadFolder%%gamefile% , %primaryFolder%%gamefile%
-    SoundBeep
-    SoundBeep
+    msg = Could not move files - %dowloadFolder%%gamefile% -- %primaryFolder%%gamefile%
+    errorMessage(msg)
 }
+SoundBeep
+SoundBeep
 Return
 
 errorMessage(msg)
